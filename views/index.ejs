@@ -43,7 +43,7 @@
 
     <script>
       // Kết nối đến WebSocket server
-      ws = new WebSocket("wss://server-8lea.onrender.com");
+      socket = new WebSocket("wss://server-8lea.onrender.com");
       // Khi kết nối WebSocket được mở
       socket.addEventListener('open', () => {
         console.log('Connected to the server');
