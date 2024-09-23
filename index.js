@@ -3,9 +3,19 @@ const http = require("http");
 const WebSocket = require("ws");
 const path = require("path");
 const fs = require("fs");
+const cors = require('cors');
+
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+
+// Enable CORS for all routes
+app.use(cors());
+
+// WebSocket server with less restrictive settings
+const wss = new WebSocket.Server({ 
+  server: server,
+  verifyClient: () => true  // This allows all connections
+});
 
 // Cấu hình view engine là EJS
 app.set("view engine", "ejs");
@@ -23,11 +33,17 @@ if (!fs.existsSync(xmlDir)) {
 }
 
 // WebSocket logic
-wss.on("connection", (ws) => {
-  console.log("Client connected");
+wss.on("connection", (ws, req) => {
+  console.log(`New client connected from ${req.socket.remoteAddress}`);
 
   ws.on("message", (message) => {
-    const data = JSON.parse(message);
+    let data;
+    try {
+      data = JSON.parse(message);
+    } catch (error) {
+      console.error("Error parsing message:", error);
+      return;
+    }
 
     switch (data.type) {
       case "screenshot":
@@ -39,31 +55,18 @@ wss.on("connection", (ws) => {
         break;
 
       case "click":
-        wss.clients.forEach((client) => {
-          client.send(JSON.stringify(data));
-        });
-        break;
       case "open":
-        // Handle 'click' and 'open' actions
-        // send to all clients
-        wss.clients.forEach((client) => {
-          client.send(JSON.stringify(data));
-        });
-        console.log(`Action ${data.type} with text: ${data.data.text}`);
-        break;
-
       case "fill":
-        // Handle 'fill' action
-        console.log(
-          `Fill action with hintText: ${data.data.hintText} and text: ${data.data.text}`
-        );
+        // Broadcast these actions to all clients
         wss.clients.forEach((client) => {
-          client.send(JSON.stringify(data));
-        })
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(data));
+          }
+        });
+        console.log(`Action ${data.type} with data:`, data.data);
         break;
 
       case "dump":
-        // Handle 'dump' action
         console.log("Dump action requested");
         break;
 
@@ -74,10 +77,10 @@ wss.on("connection", (ws) => {
         fs.writeFile(filepath, data.data.text, (err) => {
           if (err) {
             console.error("Error saving XML:", err);
-            ws.send(`Error saving XML: ${err.message}`);
+            ws.send(JSON.stringify({ type: "error", message: `Error saving XML: ${err.message}` }));
           } else {
             console.log(`XML saved to ${filepath}`);
-            ws.send(`XML saved as ${filename}`);
+            ws.send(JSON.stringify({ type: "success", message: `XML saved as ${filename}` }));
           }
         });
         break;
@@ -90,6 +93,7 @@ wss.on("connection", (ws) => {
 });
 
 // Server lắng nghe trên cổng 8080
-server.listen(8080, () => {
-  console.log("Server is listening on port 8080");
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
 });
