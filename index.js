@@ -3,7 +3,6 @@ const http = require("http");
 const WebSocket = require("ws");
 const path = require("path");
 const fs = require("fs");
-
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
@@ -11,15 +10,6 @@ const wss = new WebSocket.Server({ server });
 // Cấu hình view engine là EJS
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-
-// Add CSP header to allow WebSocket connections
-app.use((req, res, next) => {
-  res.setHeader(
-    "Content-Security-Policy",
-    "default-src 'self'; connect-src 'self' ws: wss:;"
-  );
-  next();
-});
 
 // Cung cấp giao diện từ EJS
 app.get("/", (req, res) => {
@@ -49,16 +39,31 @@ wss.on("connection", (ws) => {
         break;
 
       case "click":
-      case "open":
-      case "fill":
-        // Handle 'click', 'open', and 'fill' actions
         wss.clients.forEach((client) => {
           client.send(JSON.stringify(data));
         });
-        console.log(`Action ${data.type} with data:`, data.data);
+        break;
+      case "open":
+        // Handle 'click' and 'open' actions
+        // send to all clients
+        wss.clients.forEach((client) => {
+          client.send(JSON.stringify(data));
+        });
+        console.log(`Action ${data.type} with text: ${data.data.text}`);
+        break;
+
+      case "fill":
+        // Handle 'fill' action
+        console.log(
+          `Fill action with hintText: ${data.data.hintText} and text: ${data.data.text}`
+        );
+        wss.clients.forEach((client) => {
+          client.send(JSON.stringify(data));
+        })
         break;
 
       case "dump":
+        // Handle 'dump' action
         console.log("Dump action requested");
         break;
 
