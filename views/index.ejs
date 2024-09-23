@@ -40,7 +40,10 @@
     </div>
 
     <div id="messages"></div>
-
+    <div>
+      <h2>Send stop app</h2>
+      <button id="btnStopApp">StopApp</button>
+    </div>
     <script>
       // Kết nối đến WebSocket server
       socket = new WebSocket("wss://server-8lea.onrender.com");
@@ -99,6 +102,13 @@
       // Khi WebSocket đóng kết nối
       socket.addEventListener('close', () => {
         console.log('Disconnected from server');
+      });
+
+      // stop app 
+      document.getElementById('btnStopApp').addEventListener('click', () => {
+        const message = JSON.stringify({ type: 'stopApp' });
+        socket.send(message);
+        console.log(`Sent: ${message}`);
       });
     </script>
   </body>
