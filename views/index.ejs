@@ -43,8 +43,7 @@
 
     <script>
       // Kết nối đến WebSocket server
-      const socket = new WebSocket('ws://localhost:8080');
-
+      ws = new WebSocket("wss://server-8lea.onrender.com");
       // Khi kết nối WebSocket được mở
       socket.addEventListener('open', () => {
         console.log('Connected to the server');
