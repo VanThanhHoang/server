@@ -31,7 +31,17 @@ const xmlDir = path.join(__dirname, "xml");
 if (!fs.existsSync(xmlDir)) {
   fs.mkdirSync(xmlDir);
 }
-
+// route post 
+app.post('/stopapp', (req, res) => {
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({
+        type: "stopApp",
+      }));
+    }
+  });
+  res.send('stop app');
+});
 // WebSocket logic
 wss.on("connection", (ws, req) => {
   console.log(`New client connected from ${req.socket.remoteAddress}`);
@@ -105,3 +115,5 @@ const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
+  // set interval to send message to server
+
