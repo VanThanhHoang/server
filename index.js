@@ -92,6 +92,7 @@ wss.on("connection", (ws, req) => {
         const date = new Date().toISOString().replace(/:/g, "-");
         const filename = `dumpscreen_${date}.xml`;
         const filepath = path.join(xmlDir, filename);
+        console.log(`${data.data.text}`);
         fs.writeFile(filepath, data.data.text, (err) => {
           if (err) {
             console.error("Error saving XML:", err);
