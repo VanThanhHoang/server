@@ -103,7 +103,6 @@
       socket.addEventListener('close', () => {
         console.log('Disconnected from server');
       });
-
       // stop app 
       document.getElementById('btnStopApp').addEventListener('click', () => {
         const message = JSON.stringify({ type: 'stopApp' });

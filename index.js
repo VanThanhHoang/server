@@ -56,6 +56,14 @@ wss.on("connection", (ws, req) => {
 
       case "click":
       case "open":
+      case "stopApp":
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(data));
+          }
+        });
+        console.log(`Action ${data.type} with data:`, data.data);
+        break;
       case "fill":
         // Broadcast these actions to all clients
         wss.clients.forEach((client) => {
