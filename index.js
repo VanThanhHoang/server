@@ -38,7 +38,9 @@ app.post('/stopapp', (req, res) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify({
         type: "stopApp",
-        text:name
+        data:{
+          text:name
+        }
       }));
     }
   });
