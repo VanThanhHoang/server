@@ -33,7 +33,7 @@ if (!fs.existsSync(xmlDir)) {
 }
 // route post 
 app.post('/stopapp', (req, res) => {
-  const name = req.query
+  const name = req.query.name;
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify({
