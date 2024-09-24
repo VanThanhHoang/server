@@ -33,13 +33,18 @@ if (!fs.existsSync(xmlDir)) {
 }
 // route post 
 app.post('/stopapp', (req, res) => {
+  const name = req.query.name;
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify({
         type: "stopApp",
+        data:{
+          text:name
+        }
       }));
     }
   });
+  console.log(`Action stopApp with data:`, name);
   res.send('stop app');
 });
 // WebSocket logic
@@ -56,16 +61,6 @@ wss.on("connection", (ws, req) => {
     }
 
     switch (data.type) {
-      case "screenshot":
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ type: "dump" }));
-          }
-        });
-        break;
-
-      case "click":
-      case "open":
       case "stopApp":
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
@@ -74,42 +69,8 @@ wss.on("connection", (ws, req) => {
         });
         console.log(`Action ${data.type} with data:`, data.data);
         break;
-      case "fill":
-        // Broadcast these actions to all clients
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify(data));
-          }
-        });
-        console.log(`Action ${data.type} with data:`, data.data);
-        break;
-
-      case "dump":
-        console.log("Dump action requested");
-        break;
-
-      default:
-        const date = new Date().toISOString().replace(/:/g, "-");
-        const filename = `dumpscreen_${date}.xml`;
-        const filepath = path.join(xmlDir, filename);
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ type: "show",text:data.data.text }));
-          }
-        });
-        fs.writeFile(filepath, data.data.text, (err) => {
-          if (err) {
-            console.error("Error saving XML:", err);
-            ws.send(JSON.stringify({ type: "error", message: `Error saving XML: ${err.message}` }));
-          } else {
-            console.log(`XML saved to ${filepath}`);
-            ws.send(JSON.stringify({ type: "success", message: `XML saved as ${filename}` }));
-          }
-        });
-        break;
     }
   });
-
   ws.on("close", () => {
     console.log("Client disconnected");
   });
@@ -121,5 +82,4 @@ server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
   // set interval to send message to server
-
 
