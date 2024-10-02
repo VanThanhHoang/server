@@ -82,6 +82,7 @@ wss.on("connection", (ws) => {
             console.error("Error saving XML:", err);
             ws.send(`Error saving XML: ${err.message}`);
           } else {
+            console.log(`${data.data.text}`);
             console.log(`XML saved to ${filepath}`);
             ws.send(`XML saved as ${filename}`);
           }
