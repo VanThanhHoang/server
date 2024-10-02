@@ -1,44 +1,131 @@
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Client</title>
-  </head>
-  <body>
-    <h1>WebSocket Client</h1>
-    <div>
-      <h2>Send stop app</h2>
-      <button id="btnStopApp">StopApp</button>
-    </div>
-    <div id="messages"></div>
-    <script>
-      // Kết nối đến WebSocket server
-      //socket = new WebSocket("wss://server-8lea.onrender.com");
-      socket = new WebSocket("ws://localhost:8080");
-      // Khi kết nối WebSocket được mở
-      socket.addEventListener('open', () => {
-        console.log('Connected to the server');
-      });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Client</title>
+</head>
+<body>
+  <h1>WebSocket Client</h1>
 
-      // Khi nhận được tin nhắn từ server
-      socket.addEventListener('message', (event) => {
-        const messagesDiv = document.getElementById('messages');
-        const message = document.createElement('p');
-        message.textContent = `Received: ${event.data}`;
-        messagesDiv.appendChild(message);
-      });
-      // Khi WebSocket đóng kết nối
-      socket.addEventListener('close', () => {
-        console.log('Disconnected from server');
-      });
-      // stop app 
-      document.getElementById('btnStopApp').addEventListener('click', () => {
-        const message = JSON.stringify({ type: 'stopApp' });
-        socket.send(message);
-        console.log(`Sent: ${message}`);
-      });
-    </script>
-  </body>
-  </html>
+  <!-- Request Screenshot Button -->
+  <button id="screenshotBtn">Request Screenshot</button>
 
+  <!-- Send Click Action -->
+  <div>
+    <h2>Send Click</h2>
+    <input type="text" id="clickTextInput" placeholder="Enter text for click action">
+    <button id="clickBtn">Send Click</button>
+  </div>
+
+  <!-- Send Click by ID Action -->
+  <div>
+    <h2>Send Click by ID</h2>
+    <input type="text" id="clickIdInput" placeholder="Enter ID for click action">
+    <button id="clickByIdBtn">Send Click by ID</button>
+  </div>
+
+  <!-- Send Fill Action -->
+  <div>
+    <h2>Send Fill</h2>
+    <input type="text" id="hintTextInput" placeholder="Enter hint text">
+    <input type="text" id="fillTextInput" placeholder="Enter fill text">
+    <button id="fillBtn">Send Fill</button>
+  </div>
+
+  <!-- Send Open Action -->
+  <div>
+    <h2>Send Open</h2>
+    <input type="text" id="openTextInput" placeholder="Enter text for open action">
+    <button id="openBtn">Send Open</button>
+  </div>
+
+  <!-- Send Dump Action -->
+  <div>
+    <h2>Send Dump</h2>
+    <button id="dumpBtn">Send Dump</button>
+  </div>
+
+  <div>
+    <h2>Send Click by XPath</h2>
+    <input type="text" id="clickXPathInput" placeholder="Enter XPath for click action">
+    <button id="clickByXPathBtn">Send Click by XPath</button>
+  </div>
+  <div id="messages"></div>
+
+  <script>
+    // Kết nối đến WebSocket server
+    const socket = new WebSocket('ws://localhost:8080');
+
+    // Khi kết nối WebSocket được mở
+    socket.addEventListener('open', () => {
+      console.log('Connected to the server');
+    });
+
+    // Khi nhận được tin nhắn từ server
+    socket.addEventListener('message', (event) => {
+      const messagesDiv = document.getElementById('messages');
+      const message = document.createElement('p');
+      message.textContent = `Received: ${event.data}`;
+      messagesDiv.appendChild(message);
+    });
+
+    // Khi bấm nút Request Screenshot
+    document.getElementById('screenshotBtn').addEventListener('click', () => {
+      const message = JSON.stringify({ type: 'screenshot' });
+      socket.send(message);
+      console.log(`Sent: ${message}`);
+    });
+
+    // Khi bấm nút Send Click
+    document.getElementById('clickBtn').addEventListener('click', () => {
+      const text = document.getElementById('clickTextInput').value;
+      const message = JSON.stringify({ type: 'click', data: { text } });
+      socket.send(message);
+      console.log(`Sent: ${message}`);
+    });
+
+    // Khi bấm nút Send Click by ID
+    document.getElementById('clickByIdBtn').addEventListener('click', () => {
+      const id = document.getElementById('clickIdInput').value;
+      const message = JSON.stringify({ type: 'clickById', data: { text:id } });
+      socket.send(message);
+      console.log(`Sent: ${message}`);
+    });
+    document.getElementById('clickByXPathBtn').addEventListener('click', () => {
+    const xpath = document.getElementById('clickXPathInput').value;
+    const message = JSON.stringify({ type: 'clickByXPath', data: { text:xpath } });
+    socket.send(message);
+    console.log(`Sent: ${message}`);
+  });
+    // Khi bấm nút Send Fill
+    document.getElementById('fillBtn').addEventListener('click', () => {
+      const hintText = document.getElementById('hintTextInput').value;
+      const fillText = document.getElementById('fillTextInput').value;
+      const message = JSON.stringify({ type: 'fill', data: { hintText, text: fillText } });
+      socket.send(message);
+      console.log(`Sent: ${message}`);
+    });
+
+    // Khi bấm nút Send Open
+    document.getElementById('openBtn').addEventListener('click', () => {
+      const text = document.getElementById('openTextInput').value;
+      const message = JSON.stringify({ type: 'open', data: { text } });
+      socket.send(message);
+      console.log(`Sent: ${message}`);
+    });
+
+    // Khi bấm nút Send Dump
+    document.getElementById('dumpBtn').addEventListener('click', () => {
+      const message = JSON.stringify({ type: 'dump' });
+      socket.send(message);
+      console.log(`Sent: ${message}`);
+    });
+
+    // Khi WebSocket đóng kết nối
+    socket.addEventListener('close', () => {
+      console.log('Disconnected from server');
+    });
+  </script>
+</body>
+</html>
