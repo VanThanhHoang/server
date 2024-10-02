@@ -90,8 +90,8 @@
       socket.send(message);
       console.log(`Sent: ${message}`);
     });
-//XY
-    document.getElementById('clickByXPathBtn').addEventListener('click', () => {
+// XY
+   document.getElementById('clickByXyBtn').addEventListener('click', () => {
       const id = document.getElementById('clickXy').value;
       const message = JSON.stringify({ type: 'click_xy', data: { text:id } });
       socket.send(message);

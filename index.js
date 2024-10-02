@@ -41,6 +41,11 @@ wss.on("connection", (ws) => {
 
       case "click":
       case "clickById":
+      case "click_xy":
+        wss.clients.forEach((client) => {
+          client.send(JSON.stringify(data));
+        });
+        break;
       case "open":
         // Handle 'click', 'clickById', and 'open' actions
         // send to all clients
