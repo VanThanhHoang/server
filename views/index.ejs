@@ -46,6 +46,13 @@
     <button id="dumpBtn">Send Dump</button>
   </div>
 
+    <!-- Send Click by ID Action -->
+  <div>
+      <h2>Send Click by ID</h2>
+      <input type="text" id="clickXy" placeholder="Enter XY for click action">
+      <button id="clickByXyBtn">Send Click by ID</button>
+  </div>
+
   <div>
     <h2>Send Click by XPath</h2>
     <input type="text" id="clickXPathInput" placeholder="Enter XPath for click action">
@@ -80,6 +87,13 @@
     document.getElementById('clickBtn').addEventListener('click', () => {
       const text = document.getElementById('clickTextInput').value;
       const message = JSON.stringify({ type: 'click', data: { text } });
+      socket.send(message);
+      console.log(`Sent: ${message}`);
+    });
+//XY
+    document.getElementById('clickByXPathBtn').addEventListener('click', () => {
+      const id = document.getElementById('clickXy').value;
+      const message = JSON.stringify({ type: 'click_xy', data: { text:id } });
       socket.send(message);
       console.log(`Sent: ${message}`);
     });
